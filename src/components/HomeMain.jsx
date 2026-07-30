@@ -13,8 +13,8 @@ const HomeMain = () => {
   return (
     <div>
 
-      <BirthdaySurpriseNew/>
-      {/* <CrushProposal/> */}
+      {/*<BirthdaySurpriseNew/>*/}
+      <CrushProposal/>
         {/* <LovePurpose/> */}
         {/* <LovePurposeHindi/> */}
         {/* <FlirtyLoveProposal/> */}
