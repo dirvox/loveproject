@@ -8,21 +8,32 @@ import InteractiveLoveStory2 from './InteractiveLoveStory2'
 import BirthdayWish from './BirthdayWish'
 import CrushProposal from './Crushproposal'
 import BirthdaySurpriseNew from './BirthdaySurpriseNew'
+import LovelyHinglishProposal from './CrushProposalNew'
 
 const HomeMain = () => {
   return (
     <div>
 
-      <BirthdaySurpriseNew/>
+      {/* <BirthdaySurpriseNew/> */}
       {/* <CrushProposal/> */}
         {/* <LovePurpose/> */}
+
+
+        {/* love project code  */}
         {/* <LovePurposeHindi/> */}
+
+        
         {/* <FlirtyLoveProposal/> */}
         {/* <BirthdaySurprise/> */}
 
         {/* <InteractiveLoveStory/> */}
         {/* <InteractiveLoveStory2/> */}
         {/* <BirthdayWish/> */}
+
+
+
+        <CrushProposal/>
+        {/* <LovelyHinglishProposal/> */}
     </div>
   )
 }

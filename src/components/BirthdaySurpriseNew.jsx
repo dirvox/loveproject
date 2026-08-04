@@ -3,14 +3,110 @@ import gsap from 'gsap';
 
 // Pre-defined attractive images from Unsplash for cards
 const FOOD_OPTIONS = [
-  { id: 'italian', label: 'Italian & Pasta', img: 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=300&q=80' },
-  { id: 'sushi', label: 'Sushi Date', img: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=300&q=80' },
-  { id: 'pizza', label: 'Pizza & Chill', img: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&q=80' },
-  { id: 'tacos', label: 'Tacos & Margs', img: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=300&q=80' },
+  {
+    id: "italian",
+    label: "Italian & Pasta",
+    img: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=300&q=80",
+  },
+  {
+    id: "sushi",
+    label: "Sushi Date",
+    img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=300&q=80",
+  },
+  {
+    id: "pizza",
+    label: "Pizza & Chill",
+    img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&q=80",
+  },
+  {
+    id: "tacos",
+    label: "Tacos & Margs",
+    img: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=300&q=80",
+  },
+  {
+    id: "burger",
+    label: "Burger & Fries",
+    img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&q=80",
+  },
+  {
+    id: "bbq",
+    label: "BBQ Feast",
+    img: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=300&q=80",
+  },
+  {
+    id: "steak",
+    label: "Steak Dinner",
+    img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=300&q=80",
+  },
+  {
+    id: "indian",
+    label: "Indian Cuisine",
+    img: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=300&q=80",
+  },
+  {
+    id: "chinese",
+    label: "Chinese Food",
+    img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=300&q=80",
+  },
+  {
+    id: "thai",
+    label: "Thai Delights",
+    img: "https://images.unsplash.com/photo-1559314809-0f31657def5e?w=300&q=80",
+  },
+  {
+    id: "mexican",
+    label: "Mexican Fiesta",
+    img: "https://images.unsplash.com/photo-1615870216519-2f9fa575fa5c?w=300&q=80",
+  },
+  {
+    id: "ramen",
+    label: "Ramen Night",
+    img: "https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=300&q=80",
+  },
+  {
+    id: "seafood",
+    label: "Seafood Special",
+    img: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300&q=80",
+  },
+  {
+    id: "breakfast",
+    label: "Breakfast & Brunch",
+    img: "https://images.unsplash.com/photo-1533089860892-a9b969df67a3?w=300&q=80",
+  },
+  {
+    id: "dessert",
+    label: "Desserts & Ice Cream",
+    img: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=300&q=80",
+  },
+  {
+    id: "coffee",
+    label: "Coffee & Cafe",
+    img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300&q=80",
+  },
+  {
+    id: "vegan",
+    label: "Vegan & Healthy",
+    img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&q=80",
+  },
+  {
+    id: "salad",
+    label: "Fresh Salads",
+    img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80",
+  },
+  {
+    id: "korean",
+    label: "Korean BBQ",
+    img: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300&q=80",
+  },
+  {
+    id: "buffet",
+    label: "Buffet Night",
+    img: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=300&q=80",
+  },
 ];
 
 const MOVIE_OPTIONS = [
-  { id: 'romcom', label: 'Romantic Comedy', img: 'https://images.unsplash.com/photo-1518104593124-ac2e82a5eb9b?w=300&q=80' },
+  { id: 'romcom', label: 'Romantic Comedy', img: 'https://images.unsplash.com/photo-1543599538-a6c4f6cc5c05?w=300&q=80' },
   { id: 'horror', label: 'Horror / Spooky', img: 'https://images.unsplash.com/photo-1505635552518-3448ff116af3?w=300&q=80' },
   { id: 'scifi', label: 'Sci-Fi / Marvel', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=300&q=80' },
   { id: 'comedy', label: 'Pure Comedy', img: 'https://images.unsplash.com/photo-1543599538-a6c4f6cc5c05?w=300&q=80' },

@@ -1,304 +1,247 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from 'react';
+import { gsap } from 'gsap';
 
-const questions = [
-  {
-    q: "Ek sacchi baat pucchu?",
-    sub: "Kya tum believe karti ho ki kuch log bina try kiye smile la dete hain?",
-    yes: "Haan, believe karti hoon",
-    no: "Kabhi socha nahi",
-  },
-  {
-    q: "Agar main kahoon ki tumhari yaad roz aati hai...",
-    sub: "toh kya tumhe bhi kabhi kabhi mera khayal aata hai?",
-    yes: "Shayad haan",
-    no: "Bata nahi sakti",
-  },
-  {
-    q: "Last one, promise.",
-    sub: "Kya tum ready ho ek chhoti si sacchai sunne ke liye?",
-    yes: "Ready hoon",
-    no: "Thoda darr lag raha hai",
-  },
-];
+export default function UltimateGlassProposal() {
+  const [envelopeState, setEnvelopeState] = useState('sealed'); // sealed, opening, opened, accepted
+  const [maybeCount, setMaybeCount] = useState(0);
 
-const heartEmojis = ["💗", "💖", "💕", "💓", "💞"];
+  const containerRef = useRef(null);
+  const envelopeRef = useRef(null);
+  const flapRef = useRef(null);
+  const letterRef = useRef(null);
+  const waxSealRef = useRef(null);
+  const paperContentRef = useRef(null);
 
-export default function CrushProposal() {
-  const [stage, setStage] = useState("intro");
-  const [qIndex, setQIndex] = useState(0);
-  const [noPos, setNoPos] = useState({ x: 0, y: 0 });
-  const [yesScale, setYesScale] = useState(1);
-  const [accepted, setAccepted] = useState(false);
-  const wrapRef = useRef(null);
+  // Success confetti effect (heart particles)
+  useEffect(() => {
+    if (envelopeState === 'accepted') {
+      const ctx = gsap.context(() => {
+        const hearts = gsap.utils.toArray('.heart-confetti');
+        hearts.forEach((heart) => {
+          gsap.set(heart, {
+            x: '50vw',
+            y: '50vh',
+            opacity: 1,
+            scale: 'random(0.8, 2.5)',
+          });
+          gsap.to(heart, {
+            x: `random(-50vw, 150vw)`,
+            y: `random(-50vh, 150vh)`,
+            opacity: 0,
+            rotation: `random(-360, 360)`,
+            duration: `random(2.5, 5)`,
+            ease: "power3.out",
+            delay: `random(0, 0.4)`
+          });
+        });
+      }, containerRef);
+      return () => ctx.revert();
+    }
+  }, [envelopeState]);
 
-  const styles = {
-    page: {
-      minHeight: "100vh",
-      width: "100%",
-      background: "linear-gradient(135deg, #ffdde1 0%, #ffe6f0 45%, #ffd1dc 100%)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontFamily: "'Segoe UI', 'Poppins', sans-serif",
-      padding: "24px",
-      boxSizing: "border-box",
-      overflow: "hidden",
-      position: "relative",
-    },
-    card: {
-      background: "rgba(255, 255, 255, 0.85)",
-      borderRadius: "24px",
-      padding: "clamp(24px, 6vw, 48px)",
-      maxWidth: "480px",
-      width: "100%",
-      textAlign: "center",
-      boxShadow: "0 20px 60px rgba(214, 51, 108, 0.25)",
-      backdropFilter: "blur(6px)",
-      position: "relative",
-      zIndex: 2,
-    },
-    title: {
-      fontSize: "clamp(22px, 5vw, 30px)",
-      color: "#c2185b",
-      marginBottom: "10px",
-      fontWeight: 700,
-    },
-    sub: {
-      fontSize: "clamp(14px, 3.5vw, 17px)",
-      color: "#6d4c5c",
-      marginBottom: "26px",
-      lineHeight: 1.5,
-    },
-    heart: {
-      fontSize: "clamp(40px, 12vw, 64px)",
-      marginBottom: "16px",
-      animation: "pulse 1.4s ease-in-out infinite",
-      display: "inline-block",
-    },
-    primaryBtn: {
-      background: "linear-gradient(135deg, #ff5c8a, #ff85a2)",
-      color: "#fff",
-      border: "none",
-      borderRadius: "50px",
-      padding: "14px 34px",
-      fontSize: "clamp(15px, 3.5vw, 17px)",
-      fontWeight: 600,
-      cursor: "pointer",
-      boxShadow: "0 8px 20px rgba(255, 92, 138, 0.4)",
-      transition: "transform 0.2s ease",
-      margin: "6px",
-    },
-    ghostBtn: {
-      background: "transparent",
-      color: "#c2185b",
-      border: "2px solid #ffb3c6",
-      borderRadius: "50px",
-      padding: "12px 30px",
-      fontSize: "clamp(14px, 3.5vw, 16px)",
-      fontWeight: 600,
-      cursor: "pointer",
-      margin: "6px",
-    },
-    btnRow: {
-      display: "flex",
-      justifyContent: "center",
-      flexWrap: "wrap",
-      gap: "10px",
-      marginTop: "20px",
-      position: "relative",
-      minHeight: "70px",
-    },
-    noBtn: {
-      background: "#fff",
-      color: "#c2185b",
-      border: "2px solid #ffb3c6",
-      borderRadius: "50px",
-      padding: "12px 30px",
-      fontSize: "clamp(14px, 3.5vw, 16px)",
-      fontWeight: 600,
-      cursor: "pointer",
-      position: "relative",
-      transition: "transform 0.15s ease, left 0.15s ease, top 0.15s ease",
-    },
-    finalScreen: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-    },
-    floatingHeart: {
-      position: "absolute",
-      fontSize: "22px",
-      animation: "floatUp 3.5s linear forwards",
-      zIndex: 1,
-      pointerEvents: "none",
-    },
-    counter: {
-      fontSize: "13px",
-      color: "#b06080",
-      marginBottom: "16px",
-      letterSpacing: "1px",
-    },
+  // Main opening animation sequence (PERFECTLY RESPONSIVE)
+  const openLetter = () => {
+    if (envelopeState !== 'sealed') return;
+
+    setEnvelopeState('opening');
+    
+    const tl = gsap.timeline({
+      onComplete: () => setEnvelopeState('opened')
+    });
+
+    // 1. Pop the wax seal
+    tl.to(waxSealRef.current, { scale: 0, opacity: 0, duration: 0.4, ease: "back.in(2)" })
+      
+      // 2. Open the flap
+      .to(flapRef.current, { rotationX: 180, duration: 0.6, ease: "power2.inOut" }, "-=0.1")
+      .set(flapRef.current, { zIndex: 0 }) 
+      
+      // 3. Slide the letter up out of the envelope
+      .to(letterRef.current, { yPercent: -120, duration: 0.8, ease: "power2.out" }, "-=0.2")
+      
+      // 4. Drop the envelope away completely
+      .to(envelopeRef.current, { y: '100vh', scale: 0.5, opacity: 0, duration: 1, ease: "power3.inOut" }, "+=0.1")
+      
+      // 5. Transform the letter into a massive, centered Glass card
+      .to(letterRef.current, { 
+        position: 'fixed',
+        top: '50%', 
+        left: '50%', 
+        xPercent: -50, 
+        yPercent: -50,
+        width: '90vw', 
+        maxWidth: '450px',
+        height: 'auto',
+        minHeight: '60vh',
+        padding: '2rem',
+        borderRadius: '24px',
+        boxShadow: '0 30px 60px -12px rgba(225, 29, 72, 0.5), inset 0 0 20px rgba(255,255,255,0.5)',
+        duration: 0.8, 
+        ease: "back.out(1.1)" 
+      }, "-=0.6")
+      
+      // 6. Fade in the text inside the glass letter
+      .fromTo(paperContentRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, "-=0.2");
   };
 
-  const keyframes = `
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.12); }
-    }
-    @keyframes floatUp {
-      0% { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(-400px) scale(1.4); opacity: 0; }
-    }
-    @keyframes popIn {
-      0% { transform: scale(0.7); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-  `;
+  const maybeMessages = [
+    "Are you sure? 🥺",
+    "Think about it again...",
+    "But we'd look so cute!",
+    "Okay, last chance!",
+    "Maan jao na please..."
+  ];
 
-  const moveNoButton = () => {
-    const wrap = wrapRef.current;
-    if (!wrap) return;
-    const wrapWidth = wrap.offsetWidth;
-    const wrapHeight = wrap.offsetHeight;
-    const maxX = Math.max(wrapWidth - 120, 40);
-    const maxY = Math.max(wrapHeight - 50, 20);
-    const newX = Math.random() * maxX - maxX / 2;
-    const newY = Math.random() * maxY - maxY / 2;
-    setNoPos({ x: newX, y: newY });
-    setYesScale((prev) => Math.min(prev + 0.12, 2.2));
-  };
-
-  const handleQuestionYes = () => {
-    if (qIndex < questions.length - 1) {
-      setQIndex(qIndex + 1);
-    } else {
-      setStage("final");
-    }
-  };
-
-  const [floatingHearts, setFloatingHearts] = useState([]);
-
-  const handleAccept = () => {
-    setAccepted(true);
-    const hearts = Array.from({ length: 24 }, (_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      delay: Math.random() * 1.5,
-      emoji: heartEmojis[Math.floor(Math.random() * heartEmojis.length)],
-    }));
-    setFloatingHearts(hearts);
+  const handleMaybe = () => {
+    setMaybeCount(prev => (prev + 1) % maybeMessages.length);
+    gsap.fromTo(".maybe-btn", { x: -8 }, { x: 8, duration: 0.1, repeat: 5, yoyo: true, ease: "linear" });
   };
 
   return (
-    <div style={styles.page}>
-      <style>{keyframes}</style>
+    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-[#ffd1df] via-[#ffb6c1] to-[#ff9a9e] flex items-center justify-center p-4 font-sans overflow-hidden relative selection:bg-rose-400 selection:text-white">
+      
+      {/* Import handwritten and modern fonts */}
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;600&display=swap');
+          .font-handwritten { font-family: 'Dancing Script', cursive; }
+          .font-modern { font-family: 'Poppins', sans-serif; }
+          .envelope-perspective { perspective: 1500px; transform-style: preserve-3d; }
+          .backface-hidden { backface-visibility: hidden; }
+          
+          /* Extreme Glassmorphism */
+          .glass-panel {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-top: 1px solid rgba(255, 255, 255, 0.8);
+            border-left: 1px solid rgba(255, 255, 255, 0.8);
+          }
+        `}
+      </style>
 
-      {floatingHearts.map((h) => (
-        <span
-          key={h.id}
-          style={{
-            ...styles.floatingHeart,
-            left: `${h.left}%`,
-            bottom: "0px",
-            animationDelay: `${h.delay}s`,
-          }}
+      {/* Floating Animated Background Orbs for Deep Glass Reflection */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-white/40 mix-blend-overlay filter blur-[80px] animate-[pulse_6s_ease-in-out_infinite]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[70vw] h-[70vw] rounded-full bg-rose-500/30 mix-blend-multiply filter blur-[100px] animate-[pulse_8s_ease-in-out_infinite_reverse]" />
+        <div className="absolute top-[30%] left-[60%] w-[40vw] h-[40vw] rounded-full bg-pink-400/40 mix-blend-screen filter blur-[90px] animate-[pulse_7s_ease-in-out_infinite]" />
+      </div>
+
+      {/* Main Centered Container */}
+      <div className="relative z-10 w-full flex flex-col items-center justify-center">
+        
+        {/* === THE ENVELOPE === */}
+        <div 
+          ref={envelopeRef}
+          className={`relative w-full max-w-[320px] aspect-[4/3] bg-rose-800 rounded-xl shadow-2xl envelope-perspective z-20 ${envelopeState === 'sealed' ? 'cursor-pointer hover:scale-105 transition-transform duration-500 hover:shadow-[0_20px_50px_rgba(225,29,72,0.5)]' : ''}`} 
+          onClick={openLetter}
         >
-          {h.emoji}
-        </span>
-      ))}
-
-      <div style={styles.card}>
-        {stage === "intro" && (
-          <div style={{ animation: "popIn 0.5s ease" }}>
-            <div style={styles.heart}>💌</div>
-            <div style={styles.title}>Hey tum...</div>
-            <div style={styles.sub}>
-              Ek chhota sa surprise hai tumhare liye. Bas 3 sawaal, phir ek sacchi baat.
-            </div>
-            <button
-              style={styles.primaryBtn}
-              onClick={() => setStage("questions")}
-              onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
-              onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
-            >
-              Shuru karein 💕
-            </button>
+          
+          {/* Back of Envelope (Inside) */}
+          <div className="absolute inset-0 bg-gradient-to-br from-rose-800 to-rose-950 rounded-xl z-10 overflow-hidden">
+            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_#ffb6c1_1px,_transparent_1px)] bg-[length:12px_12px]"></div>
           </div>
-        )}
 
-        {stage === "questions" && (
-          <div style={{ animation: "popIn 0.5s ease" }}>
-            <div style={styles.counter}>
-              SAWAAL {qIndex + 1} / {questions.length}
-            </div>
-            <div style={styles.heart}>{heartEmojis[qIndex % heartEmojis.length]}</div>
-            <div style={styles.title}>{questions[qIndex].q}</div>
-            <div style={styles.sub}>{questions[qIndex].sub}</div>
-            <div style={styles.btnRow}>
-              <button
-                style={styles.primaryBtn}
-                onClick={handleQuestionYes}
-                onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
-                onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
-              >
-                {questions[qIndex].yes}
-              </button>
-              <button
-                style={styles.ghostBtn}
-                onClick={handleQuestionYes}
-                onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
-                onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
-              >
-                {questions[qIndex].no}
-              </button>
+          {/* Top Flap */}
+          <div ref={flapRef} className="absolute top-0 left-0 w-full h-[55%] bg-gradient-to-b from-rose-600 to-rose-700 rounded-t-xl origin-top z-40 shadow-[0_5px_15px_rgba(0,0,0,0.3)]">
+            <div className="absolute inset-0 bg-gradient-to-t from-pink-100 to-pink-50 rounded-t-xl opacity-95 backface-hidden" style={{transform: 'rotateX(180deg)'}}>
+              <div className="w-full h-full border-b-2 border-rose-300/50 border-dashed mt-3"></div>
             </div>
           </div>
-        )}
 
-        {stage === "final" && !accepted && (
-          <div style={{ animation: "popIn 0.5s ease" }}>
-            <div style={styles.heart}>😳💗</div>
-            <div style={styles.title}>Will you be my girlfriend?</div>
-            <div style={styles.sub}>
-              Sach mein tumhe bahut pasand karta hoon. Ek chance doगी mujhe?
-            </div>
-            <div style={styles.btnRow} ref={wrapRef}>
-              <button
-                style={{
-                  ...styles.primaryBtn,
-                  transform: `scale(${yesScale})`,
-                }}
-                onClick={handleAccept}
-              >
-                Yes 😍
-              </button>
-              <button
-                style={{
-                  ...styles.noBtn,
-                  transform: `translate(${noPos.x}px, ${noPos.y}px)`,
-                }}
-                onMouseEnter={moveNoButton}
-                onTouchStart={moveNoButton}
-                onClick={(e) => {
-                  e.preventDefault();
-                  moveNoButton();
-                }}
-              >
-                No
-              </button>
-            </div>
+          {/* Front V-Shapes */}
+          <div className="absolute inset-0 z-30 pointer-events-none">
+            <svg viewBox="0 0 400 300" preserveAspectRatio="none" className="w-full h-full drop-shadow-xl">
+              <path d="M0 0 L200 150 L400 0 L400 300 L0 300 Z" fill="#be123c" className="stroke-rose-900 stroke-[1]"/>
+              <path d="M0 300 L200 150 L400 300 Z" fill="#9f1239" className="stroke-rose-950 stroke-[1]"/>
+            </svg>
           </div>
-        )}
 
-        {stage === "final" && accepted && (
-          <div style={{ ...styles.finalScreen, animation: "popIn 0.6s ease" }}>
-            <div style={{ ...styles.heart, fontSize: "clamp(50px, 15vw, 80px)" }}>🥰💖</div>
-            <div style={styles.title}>Yay! Tumne haan bol diya!</div>
-            <div style={styles.sub}>
-              Aaj se officially hum dono ek dooje ke hain. Thank you for saying yes 💕
+          {/* The Romantic Wax Seal */}
+          {envelopeState === 'sealed' && (
+            <div ref={waxSealRef} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-red-600 to-red-900 border-[4px] border-red-950 shadow-[0_0_30px_rgba(159,18,57,0.8)] flex items-center justify-center z-50 transition-all duration-300 group-hover:scale-110">
+              <span className="text-4xl md:text-5xl filter drop-shadow-lg text-white animate-pulse">❤️</span>
+              <div className="absolute inset-2 border-2 border-red-400/30 rounded-full"></div>
             </div>
+          )}
+
+          {/* Hint Text */}
+          {envelopeState === 'sealed' && (
+            <p className="absolute -bottom-16 left-0 w-full text-center text-rose-700 font-modern font-bold tracking-[0.2em] uppercase text-xs md:text-sm animate-pulse z-0 drop-shadow-md">
+              Tap the seal to open
+            </p>
+          )}
+        </div>
+
+        {/* === THE GLASS LETTER === */}
+        {/* Initially hidden behind the envelope flap, waiting to slide up */}
+        <div 
+          ref={letterRef} 
+          className="absolute z-10 w-[85%] max-w-[280px] h-[90%] glass-panel rounded-xl flex flex-col items-center justify-center overflow-hidden"
+          style={{ top: '5%' }} 
+        >
+          <div ref={paperContentRef} className="opacity-0 flex flex-col items-center justify-between h-full w-full py-4 px-2">
+            
+            {/* Aesthetic Image */}
+            <div className="w-28 h-28 md:w-32 md:h-32 mb-2 rounded-full overflow-hidden border-[4px] border-white/80 shadow-[0_8px_25px_rgba(225,29,72,0.3)] flex-shrink-0">
+              <img 
+                src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGZnMDNvZXkwbng3ajJ4YXV5dXNxeGxvYzdxN2doMmR4M3NuM3R5OCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/yc2pHdAoxVOrJ2m5Ha/giphy.gif" 
+                alt="Romantic mood" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {envelopeState === 'accepted' ? (
+              // --- SUCCESS CONTENT ---
+              <div className="text-center flex flex-col justify-center flex-grow w-full animate-in fade-in zoom-in duration-700 px-4">
+                <h1 className="font-handwritten text-5xl md:text-6xl font-bold text-rose-600 drop-shadow-md mb-2">
+                  Yayyy! ❤️
+                </h1>
+                <p className="font-modern text-rose-950/80 text-base md:text-lg font-medium leading-relaxed">
+                  You just made me the happiest person. I'll plan the perfect date for us! ✨
+                </p>
+              </div>
+            ) : (
+              // --- PROPOSAL CONTENT ---
+              <div className="text-center flex flex-col items-center justify-between h-full w-full px-2 md:px-6">
+                
+                <div className="mt-2 mb-4">
+                  <h1 className="font-handwritten text-4xl md:text-5xl lg:text-6xl font-bold text-rose-600 leading-tight drop-shadow-sm">
+                    Will you be my <br/>Girlfriend?
+                  </h1>
+                </div>
+
+                <p className="font-modern text-rose-950/70 text-sm md:text-base font-medium leading-relaxed mb-6">
+                  I've been thinking about this a lot, and I really want you to be mine.
+                </p>
+                
+                <div className="w-full space-y-3 mt-auto">
+                  <button 
+                    onClick={() => setEnvelopeState('accepted')}
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-rose-500 to-rose-600 text-white font-modern font-semibold text-lg hover:from-rose-600 hover:to-rose-700 hover:scale-[1.03] active:scale-95 transition-all shadow-[0_10px_25px_rgba(225,29,72,0.4)] border border-rose-400/50"
+                  >
+                    Yes, I Love You Too
+                  </button>
+                  <button 
+                    onClick={handleMaybe}
+                    className="maybe-btn w-full py-3 rounded-2xl bg-white/40 backdrop-blur-md text-rose-900 font-modern text-sm font-semibold hover:bg-white/60 transition-colors border border-white/60 shadow-sm"
+                  >
+                    {maybeMessages[maybeCount]}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
+        
+        {/* Full-Screen Confetti Container */}
+        <div className="fixed inset-0 pointer-events-none z-[100] overflow-hidden">
+          {Array.from({ length: 45 }).map((_, i) => (
+            <div key={i} className="heart-confetti absolute top-0 left-0 opacity-0 text-rose-500 text-3xl md:text-5xl filter drop-shadow-xl">❤️</div>
+          ))}
+        </div>
+
       </div>
     </div>
   );
